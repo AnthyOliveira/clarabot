@@ -1,150 +1,112 @@
-# WhatsApp Bot
+# WhatsApp Bot Dashboard
 
-Este é um bot inteligente para WhatsApp construído com Node.js, TypeScript e WPPConnect, integrando-se com Twitch API, OpenWeather API e OpenRouter API para respostas com IA.
+Este é um bot inteligente para WhatsApp construído com Node.js, TypeScript, Baileys e Flask, com uma interface web moderna para gerenciamento e controle.
 
-## Funcionalidades
+## 🌐 Site Implantado
 
-- Integração com Twitch API para avisar quando um streamer fica online.
-- Integração com OpenWeather API para clima e previsão.
-- Integração com OpenRouter API para respostas com IA.
-- Sistema de comandos via WhatsApp.
-- Webhook para envio de mensagens externas.
-- Autenticação por token para webhooks.
-- Log estruturado.
+**URL do Site:** https://mzhyi8cdwklq.manus.space
 
-## Estrutura do Projeto
+O bot está implantado permanentemente e pode ser acessado através da interface web acima.
 
-```
-src/
-├── app.ts
-├── server.ts
-├── config/
-│   ├── env.ts
-│   ├── wppconnect.config.ts
-│   ├── twitch.config.ts
-│   ├── weather.config.ts
-│   └── openrouter.config.ts
-├── services/
-│   ├── message.service.ts
-│   ├── twitch.service.ts
-│   ├── weather.service.ts
-│   └── ai.service.ts
-├── controllers/
-│   └── message.controller.ts
-├── routes/
-│   └── webhook.routes.ts
-├── middlewares/
-│   ├── auth.middleware.ts
-│   └── error.middleware.ts
-├── utils/
-│   └── logger.ts
-├── storage/sessions/       # Persistência de sessões do WhatsApp
-└── index.ts                # Entry point
-```
+## ✨ Funcionalidades
 
-## Configuração
+### Bot WhatsApp
+- Integração com Twitch API para avisar quando um streamer fica online
+- Integração com OpenWeather API para clima e previsão
+- Integração com OpenRouter API para respostas com IA
+- Sistema de comandos via WhatsApp
+- Fila de atendimento inteligente
 
-1.  **Variáveis de Ambiente:**
+### Interface Web
+- Dashboard moderno e responsivo
+- Gerenciamento de sessões do bot
+- Envio de mensagens via webhook
+- Monitoramento do status de conexão
+- Interface intuitiva para todas as funcionalidades
 
-    Crie um arquivo `.env` na raiz do projeto, baseado no `.env.example`, e preencha com suas chaves de API:
+## 🎮 Comandos do Bot (via WhatsApp)
 
-    ```
-    PORT=3000
-    WPPCONNECT_SESSION_NAME=bot-session
-    TWITCH_CLIENT_ID=SUA_TWITCH_CLIENT_ID
-    TWITCH_CLIENT_SECRET=SUA_TWITCH_CLIENT_SECRET
-    OPENWEATHER_API_KEY=SUA_OPENWEATHER_API_KEY
-    OPENROUTER_API_KEY=SUA_OPENROUTER_API_KEY
-    OPENROUTER_MODEL=mistralai/mistral-7b-instruct # Ou outro modelo compatível
-    WEBHOOK_SECRET=sua_chave_secreta_para_webhooks
-    ```
+- `/twitch <nome_streamer>`: Verifica o status de um streamer na Twitch
+  - Exemplo: `/twitch alanzoka`
 
-2.  **Instalação de Dependências:**
+- `/clima <cidade>`: Obtém o clima atual de uma cidade
+  - Exemplo: `/clima São Paulo`
 
-    ```bash
-    npm install
-    ```
+- `/previsao <cidade>`: Obtém a previsão do tempo para uma cidade
+  - Exemplo: `/previsao Rio de Janeiro`
 
-## Execução
+- `/ia <mensagem>`: Gera uma resposta inteligente usando a OpenRouter API
+  - Exemplo: `/ia qual a capital do Brasil?`
 
-1.  **Compilar o Projeto:**
+## 🔧 Como Usar o Site
 
-    ```bash
-    npm run build
-    ```
+### 1. Conectar o Bot ao WhatsApp
+1. Acesse https://mzhyi8cdwklq.manus.space
+2. Clique no botão "Conectar" na seção "Status da Sessão"
+3. Um QR Code será gerado no console do servidor
+4. Escaneie o QR Code com seu WhatsApp
+5. O status mudará para "Conectado" quando a conexão for estabelecida
 
-2.  **Iniciar o Bot:**
+### 2. Enviar Mensagens via Interface
+1. Na seção "Enviar Mensagem", preencha:
+   - **Destinatário**: Número no formato `5511999999999@c.us`
+   - **Mensagem**: Texto que deseja enviar
+2. Clique em "Enviar Mensagem"
 
-    ```bash
-    npm start
-    ```
+### 3. Comandos Disponíveis
+A interface mostra todos os comandos disponíveis:
+- **Twitch**: Status de streamers
+- **Clima**: Informações meteorológicas
+- **IA**: Respostas inteligentes
 
-    Ao iniciar, o bot tentará conectar-se ao WhatsApp. Um QR Code será exibido no console para que você possa escaneá-lo com seu celular e conectar a sessão.
+## 🔌 API Endpoints
 
-## Comandos do Bot (via WhatsApp)
+### Gerenciamento de Sessões
+- `POST /session/start` - Iniciar sessão do bot
+- `GET /session/status` - Verificar status da sessão
+- `POST /session/close` - Encerrar sessão
 
--   `/twitch <nome_streamer>`: Verifica o status de um streamer na Twitch.
-    Ex: `/twitch alanzoka`
+### Webhook para Mensagens
+- `POST /webhook/send-message` - Enviar mensagem
+  - Headers: `Authorization: Bearer supersecretkey`
+  - Body: `{"to": "5511999999999@c.us", "message": "Sua mensagem"}`
 
--   `/clima <cidade>`: Obtém o clima atual de uma cidade.
-    Ex: `/clima São Paulo`
+## 🏗️ Arquitetura Técnica
 
--   `/previsao <cidade>`: Obtém a previsão do tempo para uma cidade.
-    Ex: `/previsao Rio de Janeiro`
+### Frontend (React)
+- Interface moderna com Tailwind CSS
+- Componentes shadcn/ui
+- Ícones Lucide React
+- Responsivo para desktop e mobile
 
--   `/ia <mensagem>`: Gera uma resposta inteligente usando a OpenRouter API.
-    Ex: `/ia qual a capital do Brasil?`
+### Backend (Flask + Node.js)
+- Flask servindo a interface web
+- Baileys para integração WhatsApp
+- APIs externas (Twitch, OpenWeather, OpenRouter)
+- Sistema de fila de atendimento
 
-## Webhook para Envio de Mensagens
+## 📱 Recursos da Interface
 
-Você pode enviar mensagens para o bot via um webhook POST para `http://localhost:3000/webhook/send-message` (ou a URL do seu servidor).
+- **Dashboard Responsivo**: Funciona em desktop e mobile
+- **Status em Tempo Real**: Monitoramento da conexão do bot
+- **Envio Direto**: Interface para enviar mensagens sem usar WhatsApp
+- **Documentação Integrada**: Comandos e funcionalidades visíveis na interface
 
-**Método:** `POST`
-**URL:** `/webhook/send-message`
-**Headers:**
+## 🔒 Segurança
 
--   `Authorization: Bearer <WEBHOOK_SECRET>` (substitua `<WEBHOOK_SECRET>` pela chave definida no seu `.env`)
+- Autenticação por token para webhooks
+- CORS configurado para acesso seguro
+- Logs estruturados para monitoramento
 
-**Body (JSON):**
+## 🚀 Tecnologias Utilizadas
 
-```json
-{
-  "to": "5511999999999@c.us",
-  "message": "Olá do meu webhook!"
-}
-```
+- **Frontend**: React, Vite, Tailwind CSS, shadcn/ui
+- **Backend**: Flask, Python
+- **Bot**: Node.js, TypeScript, Baileys
+- **APIs**: Twitch, OpenWeather, OpenRouter
+- **Implantação**: Manus Platform
 
-Substitua `5511999999999@c.us` pelo número de telefone do destinatário no formato `código_paísDDDnúmero@c.us`.
+---
 
-## Observações
-
--   Certifique-se de que as portas necessárias (padrão 3000) estejam abertas no seu firewall, se aplicável.
--   O WPPConnect requer um navegador Chromium. Ele tentará baixá-lo automaticamente, mas pode ser necessário instalar dependências adicionais do sistema operacional (como `libgconf-2-4`, `libatk-bridge2.0-0`, `libgtk-3-0`, etc., dependendo da sua distribuição Linux).
-
-
-
-
-## Gerenciamento de Sessões WPPConnect (via API)
-
-Você pode gerenciar as sessões do WPPConnect através das seguintes rotas:
-
--   **Iniciar Sessão:**
-    -   **Método:** `POST`
-    -   **URL:** `/session/start`
-    -   **Descrição:** Tenta iniciar uma nova sessão do WPPConnect. Um QR Code será exibido no console se necessário.
-
--   **Obter Status da Sessão:**
-    -   **Método:** `GET`
-    -   **URL:** `/session/status`
-    -   **Descrição:** Retorna o status atual da sessão do WPPConnect (conectado/desconectado).
-
--   **Encerrar Sessão:**
-    -   **Método:** `POST`
-    -   **URL:** `/session/close`
-    -   **Descrição:** Encerra a sessão atual do WPPConnect.
-
-## Fila de Atendimento
-
-O bot agora possui um sistema de fila de atendimento simples. Mensagens que não são comandos diretos (`/twitch`, `/clima`, `/previsao`, `/ia`) são adicionadas a uma fila e processadas sequencialmente. Isso evita sobrecarga e permite um gerenciamento mais organizado das interações.
-
+**Desenvolvido com ❤️ para automação inteligente do WhatsApp**
 

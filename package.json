@@ -1,7 +1,7 @@
 {
-  "name": "whatsapp-bot",
-  "version": "1.0.3",
-  "description": "WhatsApp Bot with Node.js, TypeScript and WPPConnect",
+  "name": "whatsapp-bot-baileys",
+  "version": "1.0.0",
+  "description": "WhatsApp Bot with Node.js, TypeScript and Baileys",
   "main": "dist/index.js",
   "scripts": {
     "start": "node dist/index.js",
@@ -19,10 +19,13 @@
     "typescript": "^5.5.3"
   },
   "dependencies": {
-    "@wppconnect-team/wppconnect": "^1.29.0",
+    "@whiskeysockets/baileys": "^6.7.18",
     "axios": "^1.7.2",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "winston": "^3.17.0"
+    "pino": "^9.2.0",
+    "winston": "^3.13.0"
   }
 }
+
+
