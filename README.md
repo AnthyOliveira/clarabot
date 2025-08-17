@@ -4,7 +4,6 @@ Este é um bot inteligente para WhatsApp construído com Node.js, TypeScript, Ba
 
 ## 🌐 Site Implantado
 
-**URL do Site:** https://mzhyi8cdwklq.manus.space
 
 O bot está implantado permanentemente e pode ser acessado através da interface web acima.
 
