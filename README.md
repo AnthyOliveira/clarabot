@@ -1,111 +1,132 @@
-# WhatsApp Bot Dashboard
+# WhatsApp Bot com OpenRouter API
 
-Este é um bot inteligente para WhatsApp construído com Node.js, TypeScript, Baileys e Flask, com uma interface web moderna para gerenciamento e controle.
+Este é um bot para WhatsApp que utiliza a biblioteca Baileys para conectar-se ao WhatsApp Web e redireciona todas as mensagens recebidas para a API do OpenRouter, retornando as respostas automaticamente.
 
-## 🌐 Site Implantado
+## Características
 
+- ✅ Conexão persistente com WhatsApp (não precisa escanear QR Code toda vez)
+- ✅ Redirecionamento automático de mensagens para OpenRouter API
+- ✅ Resposta automática para o remetente original
+- ✅ Tratamento de erros e reconexão automática
+- ✅ Configuração via arquivo JSON
+- ✅ Logs detalhados para monitoramento
 
-O bot está implantado permanentemente e pode ser acessado através da interface web acima.
+## Pré-requisitos
 
-## ✨ Funcionalidades
+- Node.js 16 ou superior
+- Uma conta no OpenRouter com chave de API
+- Um número de telefone com WhatsApp para usar como bot
 
-### Bot WhatsApp
-- Integração com Twitch API para avisar quando um streamer fica online
-- Integração com OpenWeather API para clima e previsão
-- Integração com OpenRouter API para respostas com IA
-- Sistema de comandos via WhatsApp
-- Fila de atendimento inteligente
+## Instalação
 
-### Interface Web
-- Dashboard moderno e responsivo
-- Gerenciamento de sessões do bot
-- Envio de mensagens via webhook
-- Monitoramento do status de conexão
-- Interface intuitiva para todas as funcionalidades
+1. Clone ou baixe este projeto
+2. Instale as dependências:
 
-## 🎮 Comandos do Bot (via WhatsApp)
+```bash
+npm install
+```
 
-- `/twitch <nome_streamer>`: Verifica o status de um streamer na Twitch
-  - Exemplo: `/twitch alanzoka`
+## Configuração
 
-- `/clima <cidade>`: Obtém o clima atual de uma cidade
-  - Exemplo: `/clima São Paulo`
+1. Edite o arquivo `config.json` e configure sua chave da API do OpenRouter:
 
-- `/previsao <cidade>`: Obtém a previsão do tempo para uma cidade
-  - Exemplo: `/previsao Rio de Janeiro`
+```json
+{
+  "openrouter": {
+    "apiKey": "SUA_CHAVE_OPENROUTER_AQUI",
+    "baseUrl": "https://openrouter.ai/api/v1",
+    "model": "openai/gpt-3.5-turbo"
+  },
+  "whatsapp": {
+    "sessionPath": "./session",
+    "printQRInTerminal": true
+  }
+}
+```
 
-- `/ia <mensagem>`: Gera uma resposta inteligente usando a OpenRouter API
-  - Exemplo: `/ia qual a capital do Brasil?`
+### Configurações disponíveis:
 
-## 🔧 Como Usar o Site
+- `openrouter.apiKey`: Sua chave de API do OpenRouter
+- `openrouter.baseUrl`: URL base da API (normalmente não precisa alterar)
+- `openrouter.model`: Modelo de IA a ser usado (ex: "openai/gpt-3.5-turbo", "anthropic/claude-3-haiku")
+- `whatsapp.sessionPath`: Diretório onde os dados de sessão serão salvos
+- `whatsapp.printQRInTerminal`: Se deve exibir o QR Code no terminal
 
-### 1. Conectar o Bot ao WhatsApp
-1. Acesse https://mzhyi8cdwklq.manus.space
-2. Clique no botão "Conectar" na seção "Status da Sessão"
-3. Um QR Code será gerado no console do servidor
-4. Escaneie o QR Code com seu WhatsApp
-5. O status mudará para "Conectado" quando a conexão for estabelecida
+## Como usar
 
-### 2. Enviar Mensagens via Interface
-1. Na seção "Enviar Mensagem", preencha:
-   - **Destinatário**: Número no formato `5511999999999@c.us`
-   - **Mensagem**: Texto que deseja enviar
-2. Clique em "Enviar Mensagem"
+1. Execute o bot:
 
-### 3. Comandos Disponíveis
-A interface mostra todos os comandos disponíveis:
-- **Twitch**: Status de streamers
-- **Clima**: Informações meteorológicas
-- **IA**: Respostas inteligentes
+```bash
+npm start
+```
 
-## 🔌 API Endpoints
+2. Na primeira execução, um QR Code será exibido no terminal
+3. Escaneie o QR Code com seu WhatsApp (Configurações > Dispositivos conectados > Conectar um dispositivo)
+4. Aguarde a mensagem "✅ Conectado ao WhatsApp!"
+5. Agora o bot está ativo e responderá automaticamente a todas as mensagens recebidas
 
-### Gerenciamento de Sessões
-- `POST /session/start` - Iniciar sessão do bot
-- `GET /session/status` - Verificar status da sessão
-- `POST /session/close` - Encerrar sessão
+## Como funciona
 
-### Webhook para Mensagens
-- `POST /webhook/send-message` - Enviar mensagem
-  - Headers: `Authorization: Bearer supersecretkey`
-  - Body: `{"to": "5511999999999@c.us", "message": "Sua mensagem"}`
+1. O bot recebe uma mensagem no WhatsApp
+2. Extrai o texto da mensagem
+3. Envia o texto para a API do OpenRouter
+4. Recebe a resposta da IA
+5. Envia a resposta de volta para o remetente original
 
-## 🏗️ Arquitetura Técnica
+## Estrutura do projeto
 
-### Frontend (React)
-- Interface moderna com Tailwind CSS
-- Componentes shadcn/ui
-- Ícones Lucide React
-- Responsivo para desktop e mobile
+```
+whatsapp-bot/
+├── index.js          # Arquivo principal do bot
+├── config.json       # Configurações do bot
+├── package.json      # Dependências e scripts
+├── session/          # Dados de sessão do WhatsApp (criado automaticamente)
+└── README.md         # Esta documentação
+```
 
-### Backend (Flask + Node.js)
-- Flask servindo a interface web
-- Baileys para integração WhatsApp
-- APIs externas (Twitch, OpenWeather, OpenRouter)
-- Sistema de fila de atendimento
+## Logs e monitoramento
 
-## 📱 Recursos da Interface
+O bot exibe logs detalhados no console:
 
-- **Dashboard Responsivo**: Funciona em desktop e mobile
-- **Status em Tempo Real**: Monitoramento da conexão do bot
-- **Envio Direto**: Interface para enviar mensagens sem usar WhatsApp
-- **Documentação Integrada**: Comandos e funcionalidades visíveis na interface
+- 🚀 Mensagens de inicialização
+- 📱 Status do QR Code
+- ✅ Confirmação de conexão
+- 📨 Mensagens recebidas
+- ✅ Respostas enviadas
+- ❌ Erros e problemas
+- 🔄 Tentativas de reconexão
 
-## 🔒 Segurança
+## Solução de problemas
 
-- Autenticação por token para webhooks
-- CORS configurado para acesso seguro
-- Logs estruturados para monitoramento
+### Bot não conecta
+- Verifique se o QR Code foi escaneado corretamente
+- Certifique-se de que o WhatsApp está funcionando no seu celular
+- Tente deletar a pasta `session` e reconectar
 
-## 🚀 Tecnologias Utilizadas
+### Erro de API
+- Verifique se a chave do OpenRouter está correta
+- Confirme se há créditos na sua conta OpenRouter
+- Teste a chave diretamente na documentação do OpenRouter
 
-- **Frontend**: React, Vite, Tailwind CSS, shadcn/ui
-- **Backend**: Flask, Python
-- **Bot**: Node.js, TypeScript, Baileys
-- **APIs**: Twitch, OpenWeather, OpenRouter
-- **Implantação**: Manus Platform
+### Bot para de responder
+- Verifique os logs para identificar erros
+- O bot tentará reconectar automaticamente
+- Se necessário, reinicie o processo
 
----
+## Parando o bot
 
-**Desenvolvido com ❤️ para automação inteligente do WhatsApp**
+Para parar o bot de forma segura, use `Ctrl+C` no terminal. O bot desconectará adequadamente do WhatsApp antes de encerrar.
+
+## Segurança
+
+- Mantenha sua chave de API segura e não a compartilhe
+- Os dados de sessão ficam salvos localmente na pasta `session`
+- Não execute o bot em servidores públicos sem as devidas precauções
+
+## Suporte
+
+Este bot foi criado usando:
+- [Baileys](https://github.com/WhiskeySockets/Baileys) - Biblioteca para WhatsApp Web
+- [OpenRouter](https://openrouter.ai/) - API para modelos de IA
+- [Axios](https://axios-http.com/) - Cliente HTTP para Node.js
 
