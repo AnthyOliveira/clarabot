@@ -1,19 +1,29 @@
 const { 
     default: makeWASocket, 
     DisconnectReason, 
-    useMultiFileAuthState,
-    MessageType,
-    MessageOptions,
-    Mimetype
+    useMultiFileAuthState
 } = require('@whiskeysockets/baileys');
 const { Boom } = require('@hapi/boom');
 const qrcode = require('qrcode-terminal');
 const fs = require('fs');
-const path = require('path');
 const axios = require('axios');
+const dotenv = require('dotenv');
+const Session = require('./models/session');
+const sequelize = require('./config/database');
+dotenv.config();
 
-// Carregar configuração
-const config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
+// Substituir configuração estática por variáveis de ambiente
+const config = {
+    whatsapp: {
+        sessionPath: process.env.SESSION_PATH || './auth_sessions',
+        printQRInTerminal: process.env.PRINT_QR !== 'false'
+    },
+    openrouter: {
+        baseUrl: process.env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1',
+        apiKey: process.env.OPENROUTER_API_KEY,
+        model: process.env.OPENROUTER_MODEL || 'mistralai/mistral-7b-instruct'
+    }
+};
 
 class WhatsAppBot {
     constructor() {
@@ -25,28 +35,26 @@ class WhatsAppBot {
     async start() {
         console.log('🚀 Iniciando WhatsApp Bot...');
         
-        // Configurar autenticação multi-arquivo
-        const { state, saveCreds } = await useMultiFileAuthState(config.whatsapp.sessionPath);
+        // Sincronizar banco de dados
+        await sequelize.sync();
+        
+        // Buscar ou criar nova sessão
+        const [session] = await Session.findOrCreate({
+            where: { id: 'default' },
+            defaults: {
+                data: JSON.stringify({}),
+                lastUpdate: new Date()
+            }
+        });
+
+        // Configurar autenticação
+        const { state, saveCreds } = await this.getAuthState(session);
         
         // Criar socket de conexão
         this.sock = makeWASocket({
             auth: state,
-            logger: {
-                level: 'silent',
-                child: () => ({ 
-                    level: 'silent',
-                    error: () => {},
-                    warn: () => {},
-                    info: () => {},
-                    debug: () => {},
-                    trace: () => {}
-                }),
-                error: () => {},
-                warn: () => {},
-                info: () => {},
-                debug: () => {},
-                trace: () => {}
-            }
+            printQRInTerminal: true,
+            defaultQueryTimeoutMs: undefined
         });
 
         // Event listeners
@@ -55,6 +63,21 @@ class WhatsAppBot {
         this.sock.ev.on('messages.upsert', this.handleMessages.bind(this));
 
         console.log('✅ Bot configurado e aguardando conexão...');
+    }
+
+    async getAuthState(session) {
+        return {
+            state: JSON.parse(session.data),
+            saveCreds: async (data) => {
+                await Session.update(
+                    {
+                        data: JSON.stringify(data),
+                        lastUpdate: new Date()
+                    },
+                    { where: { id: 'default' } }
+                );
+            }
+        };
     }
 
     handleConnectionUpdate(update) {
@@ -200,6 +223,9 @@ process.on('SIGTERM', async () => {
 
 // Iniciar o bot
 bot.start().catch(console.error);
+
+console.log('OpenRouter Key:', process.env.OPENROUTER_API_KEY);
+console.log('Session Path:', process.env.SESSION_PATH);
 
 module.exports = WhatsAppBot;
 

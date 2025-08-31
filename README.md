@@ -13,44 +13,57 @@ Este é um bot para WhatsApp que utiliza a biblioteca Baileys para conectar-se a
 
 ## Pré-requisitos
 
-- Node.js 16 ou superior
+- Node.js 22.19.0 LTS
+- NPM 10.x ou superior
 - Uma conta no OpenRouter com chave de API
 - Um número de telefone com WhatsApp para usar como bot
 
 ## Instalação
 
-1. Clone ou baixe este projeto
-2. Instale as dependências:
+1. Instale o NVM (Node Version Manager):
+```bash
+winget install CoreyButler.NVMforWindows
+```
 
+2. Instale Node.js 22.19.0 LTS:
+```bash
+nvm install 22.19.0
+nvm use 22.19.0
+```
+
+3. Verifique a instalação:
+```bash
+node --version  # Deve mostrar v22.19.0
+npm --version   # Deve mostrar 10.x.x
+```
+
+4. Clone ou baixe este projeto
+
+5. Instale as dependências:
 ```bash
 npm install
 ```
 
 ## Configuração
 
-1. Edite o arquivo `config.json` e configure sua chave da API do OpenRouter:
+1. Copie o arquivo `.env.example` para `.env`:
 
-```json
-{
-  "openrouter": {
-    "apiKey": "SUA_CHAVE_OPENROUTER_AQUI",
-    "baseUrl": "https://openrouter.ai/api/v1",
-    "model": "openai/gpt-3.5-turbo"
-  },
-  "whatsapp": {
-    "sessionPath": "./session",
-    "printQRInTerminal": true
-  }
-}
+```bash
+cp .env.example .env
 ```
 
-### Configurações disponíveis:
+2. Configure suas variáveis de ambiente no `.env`:
 
-- `openrouter.apiKey`: Sua chave de API do OpenRouter
-- `openrouter.baseUrl`: URL base da API (normalmente não precisa alterar)
-- `openrouter.model`: Modelo de IA a ser usado (ex: "openai/gpt-3.5-turbo", "anthropic/claude-3-haiku")
-- `whatsapp.sessionPath`: Diretório onde os dados de sessão serão salvos
-- `whatsapp.printQRInTerminal`: Se deve exibir o QR Code no terminal
+```plaintext
+# OpenRouter Configuration
+OPENROUTER_API_KEY=sua_chave_aqui
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+OPENROUTER_MODEL=deepseek/deepseek-chat-v3.1:free
+
+# WhatsApp Configuration
+SESSION_PATH=./session
+PRINT_QR=true
+```
 
 ## Como usar
 
@@ -76,12 +89,20 @@ npm start
 ## Estrutura do projeto
 
 ```
-whatsapp-bot/
-├── index.js          # Arquivo principal do bot
-├── config.json       # Configurações do bot
-├── package.json      # Dependências e scripts
-├── session/          # Dados de sessão do WhatsApp (criado automaticamente)
-└── README.md         # Esta documentação
+clarabot/
+├── src/
+│   ├── config/
+│   │   └── whatsapp.config.js
+│   ├── services/
+│   │   └── whatsapp.service.js
+│   ├── utils/
+│   │   └── logger.js
+│   └── index.js
+├── .env                 # Variáveis de ambiente
+├── .env.example        # Exemplo de configuração
+├── .gitignore         # Arquivos ignorados pelo Git
+├── package.json       # Dependências e scripts
+└── README.md          # Documentação
 ```
 
 ## Logs e monitoramento
