@@ -1,15 +1,12 @@
-const { 
-    default: makeWASocket, 
-    DisconnectReason, 
-    useMultiFileAuthState
-} = require('@whiskeysockets/baileys');
-const { Boom } = require('@hapi/boom');
-const qrcode = require('qrcode-terminal');
+const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
 const fs = require('fs');
+const path = require('path');
 const axios = require('axios');
 const dotenv = require('dotenv');
 const Session = require('./models/session');
 const sequelize = require('./config/database');
+const qrcode = require('qrcode-terminal'); // Add QR code terminal
+const { Boom } = require('@hapi/boom'); // Add Boom for error handling
 dotenv.config();
 
 // Substituir configuração estática por variáveis de ambiente
@@ -50,11 +47,22 @@ class WhatsAppBot {
         // Configurar autenticação
         const { state, saveCreds } = await this.getAuthState(session);
         
-        // Criar socket de conexão
+        // Criar socket de conexão - FIXED LOGGER CONFIGURATION
         this.sock = makeWASocket({
             auth: state,
-            printQRInTerminal: true,
-            defaultQueryTimeoutMs: undefined
+            // Remove printQRInTerminal as it's deprecated
+            // Use proper logger configuration
+            logger: {
+                level: 'silent',
+                // Add minimal logger methods to avoid child error
+                child: () => ({
+                    trace: () => {},
+                    debug: () => {},
+                    info: () => {},
+                    warn: () => {},
+                    error: () => {}
+                })
+            }
         });
 
         // Event listeners
@@ -83,7 +91,8 @@ class WhatsAppBot {
     handleConnectionUpdate(update) {
         const { connection, lastDisconnect, qr } = update;
         
-        if (qr && config.whatsapp.printQRInTerminal) {
+        // Handle QR code manually (since printQRInTerminal is deprecated)
+        if (qr) {
             console.log('📱 QR Code gerado. Escaneie com seu WhatsApp:');
             qrcode.generate(qr, { small: true });
             this.qr = qr;
@@ -98,8 +107,13 @@ class WhatsAppBot {
             
             if (lastDisconnect?.error?.output?.statusCode === DisconnectReason.loggedOut || lastDisconnect?.error?.output?.statusCode === 401) {
                 console.log("Sessão inválida ou expirada. Removendo dados de sessão e tentando nova conexão...");
-                fs.rmSync(config.whatsapp.sessionPath, { recursive: true, force: true });
-                this.start();
+                // Clear session data from database
+                Session.update(
+                    { data: JSON.stringify({}), lastUpdate: new Date() },
+                    { where: { id: 'default' } }
+                ).then(() => {
+                    this.start();
+                });
             } else if (shouldReconnect) {
                 console.log("🔄 Tentando reconectar...");
                 this.start();
